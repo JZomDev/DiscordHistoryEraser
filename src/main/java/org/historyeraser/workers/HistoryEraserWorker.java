@@ -17,6 +17,7 @@ import org.historyeraser.ConfiguredChannel;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageSet;
 
 public class HistoryEraserWorker
 {
@@ -30,9 +31,9 @@ public class HistoryEraserWorker
 		this.api = api;
 	}
 
-	public CompletableFuture<ArrayList<Stream<Message>>> execute(DiscordApi api)
+	public CompletableFuture<ArrayList<CompletableFuture<MessageSet>>> execute(DiscordApi api)
 	{
-		ArrayList<Stream<Message>> arrayList = new ArrayList<>();
+		ArrayList<CompletableFuture<MessageSet>> arrayList = new ArrayList<>();
 
 		return CompletableFuture.supplyAsync(() -> {
 			try
@@ -59,14 +60,8 @@ public class HistoryEraserWorker
 					{
 						TextChannel tc = textChannel.get();
 						Instant nHoursAgo = Instant.now().minus(hours, ChronoUnit.HOURS);
-						Stream<Message> messageStream = tc.getMessagesAsStream()
-							.filter(m -> m.getCreationTimestamp()
-								.isBefore(nHoursAgo) && m.canYouDelete()
-							)
-//							.sorted((m1, m2) -> (m1.getCreationTimestamp().compareTo(m2.getCreationTimestamp())))
-							.limit(50);
 
-						arrayList.add(messageStream);
+						arrayList.add(tc.getMessagesBefore(50, getCreationTimestamp(nHoursAgo)));
 					}
 				}
 			}
@@ -76,5 +71,8 @@ public class HistoryEraserWorker
 			}
 			return arrayList;
 		}, api.getThreadPool().getExecutorService());
+	}
+	static Long getCreationTimestamp(Instant timeStampTime) {
+		 return (timeStampTime.toEpochMilli() - 1420070400000L) << 22;
 	}
 }

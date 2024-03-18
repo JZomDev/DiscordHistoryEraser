@@ -19,6 +19,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageSet;
 
 public class Main
 {
@@ -76,18 +77,14 @@ public class Main
 				// Perform your recurring method calls in here.
 				try
 				{
-
 					ArrayList<CompletableFuture<Void>> completableFutureArrayList = new ArrayList<>();
-					ArrayList<Stream<Message>> streamArrayList = worker.execute(discordApi).join();
+					ArrayList<CompletableFuture<MessageSet>> streamArrayList = worker.execute(discordApi).join();
 					for (int j = 0; j < streamArrayList.size(); j++)
 					{
-						Stream<Message> messages = streamArrayList.get(j);
-						// only delete 50 (limit set in HistoryEraserWorker) messages at a time
-						completableFutureArrayList.add(CompletableFuture.allOf(
-							messages.collect(Collectors.groupingBy(DiscordEntity::getApi, Collectors.toList()))
-								.entrySet().stream()
-								.map(entry -> Message.delete(entry.getKey(), entry.getValue()))
-								.toArray(CompletableFuture[]::new)));
+						CompletableFuture<MessageSet> messages = streamArrayList.get(j);
+						messages.whenComplete((messageSet, throwable) -> {
+							completableFutureArrayList.add(messageSet.deleteAll());
+						});
 					}
 
 					// this is effectively await
@@ -98,47 +95,12 @@ public class Main
 				}
 				catch (Exception e)
 				{
-					throw new RuntimeException(e);
+					// don't stop process, just log the error and try again
+					logger.error(e.getMessage(), e);
 				}
 			},
 			0, // How long to delay the start
 			30, // How long between executions
 			TimeUnit.SECONDS); // The time unit used
-	}
-
-	public static CompletableFuture<Boolean> finishExecutor() throws InterruptedException
-	{
-		return CompletableFuture.supplyAsync(() -> {
-			try
-			{
-				if (mService != null)
-				{
-					awaitTerminationAfterShutdown(mService);
-					return true;
-				}
-				return false;
-			}
-			catch (Throwable t)
-			{
-				throw new CompletionException(t);
-			}
-		}, discordApi.getThreadPool().getExecutorService());
-	}
-
-	public static void awaitTerminationAfterShutdown(ExecutorService threadPool)
-	{
-		threadPool.shutdown();
-		try
-		{
-			if (!threadPool.awaitTermination(60, TimeUnit.SECONDS))
-			{
-				threadPool.shutdownNow();
-			}
-		}
-		catch (InterruptedException ex)
-		{
-			threadPool.shutdownNow();
-			Thread.currentThread().interrupt();
-		}
 	}
 }
