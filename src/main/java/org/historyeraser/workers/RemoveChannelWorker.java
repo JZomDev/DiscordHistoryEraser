@@ -39,25 +39,25 @@ public class RemoveChannelWorker
 				myReader.close();
 				List<ConfiguredChannel> json = gson.fromJson(fileContentStr.toString(), typeToken);
 				JSONArray jsonArray = new JSONArray();
-				ConfiguredChannel configuredChannel = new ConfiguredChannel();
+				ConfiguredChannel removeConfiguredChannel = new ConfiguredChannel();
 				for (int i = 0; i < arg.size(); i++)
 				{
 					SlashCommandInteractionOption interactionOption = arg.get(i);
 
 					if (interactionOption.getName().equals("channel"))
 					{
-						configuredChannel.textchannelid = interactionOption.getChannelValue().get().getIdAsString();
+						removeConfiguredChannel.textchannelid = interactionOption.getChannelValue().get().getIdAsString();
 					}
 				}
 
-				for (ConfiguredChannel configuredChannel1 : json)
+				for (ConfiguredChannel configuredChannel : json)
 				{
-					if (configuredChannel1.textchannelid.equals(configuredChannel.textchannelid))
+					if (removeConfiguredChannel.textchannelid.equals(configuredChannel.textchannelid))
 					{
 						worked = true;
 						continue;
 					}
-					jsonArray.add(configuredChannel1);
+					jsonArray.add(configuredChannel);
 				}
 
 				BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("historyremover.json", false));

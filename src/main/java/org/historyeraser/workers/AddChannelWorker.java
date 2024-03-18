@@ -27,7 +27,7 @@ public class AddChannelWorker
 			try
 			{
 
-				ConfiguredChannel configuredChannel = new ConfiguredChannel();
+				ConfiguredChannel newConfiguredChannel = new ConfiguredChannel();
 				for (int i = 0; i < arg.size(); i++)
 				{
 					SlashCommandInteractionOption interactionOption = arg.get(i);
@@ -35,10 +35,10 @@ public class AddChannelWorker
 					switch (interactionOption.getName())
 					{
 						case "channel":
-							configuredChannel.textchannelid = interactionOption.getChannelValue().get().getIdAsString();
+							newConfiguredChannel.textchannelid = interactionOption.getChannelValue().get().getIdAsString();
 							break;
 						case "hours":
-							configuredChannel.hours = interactionOption.getLongValue().get().longValue();
+							newConfiguredChannel.hours = interactionOption.getLongValue().get().longValue();
 							break;
 					}
 				}
@@ -58,17 +58,17 @@ public class AddChannelWorker
 					myReader.close();
 					List<ConfiguredChannel> json = gson.fromJson(fileContentStr.toString(), typeToken);
 
-					for (ConfiguredChannel configuredChannel1 : json)
+					for (ConfiguredChannel configuredChannel : json)
 					{
-						if (configuredChannel1.textchannelid.equals(configuredChannel.textchannelid))
+						if (newConfiguredChannel.textchannelid.equals(configuredChannel.textchannelid))
 						{
 							continue;
 						}
-						jsonArray.add(configuredChannel1);
+						jsonArray.add(configuredChannel);
 					}
 				}
 
-				jsonArray.add(configuredChannel);
+				jsonArray.add(newConfiguredChannel);
 
 				BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("historyremover.json", false));
 				bufferedWriter.write(gson.toJson(jsonArray));

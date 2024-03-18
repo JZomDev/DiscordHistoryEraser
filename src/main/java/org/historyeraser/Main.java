@@ -2,13 +2,9 @@ package org.historyeraser;
 
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.historyeraser.listeners.AddChannels;
@@ -17,8 +13,6 @@ import org.historyeraser.listeners.ServerBecomesAvailable;
 import org.historyeraser.workers.HistoryEraserWorker;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
-import org.javacord.api.entity.DiscordEntity;
-import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageSet;
 
 public class Main

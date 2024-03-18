@@ -12,11 +12,9 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.stream.Stream;
 import org.historyeraser.ConfiguredChannel;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageSet;
 
 public class HistoryEraserWorker
@@ -29,6 +27,11 @@ public class HistoryEraserWorker
 	public HistoryEraserWorker(DiscordApi api)
 	{
 		this.api = api;
+	}
+
+	static Long getCreationTimestamp(Instant timeStampTime)
+	{
+		return (timeStampTime.toEpochMilli() - 1420070400000L) << 22;
 	}
 
 	public CompletableFuture<ArrayList<CompletableFuture<MessageSet>>> execute(DiscordApi api)
@@ -71,8 +74,5 @@ public class HistoryEraserWorker
 			}
 			return arrayList;
 		}, api.getThreadPool().getExecutorService());
-	}
-	static Long getCreationTimestamp(Instant timeStampTime) {
-		 return (timeStampTime.toEpochMilli() - 1420070400000L) << 22;
 	}
 }
