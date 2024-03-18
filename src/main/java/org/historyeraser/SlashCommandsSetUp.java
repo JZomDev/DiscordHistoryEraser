@@ -30,7 +30,7 @@ public class SlashCommandsSetUp
 			.setDefaultEnabledForPermissions(PermissionType.ADMINISTRATOR)
 		);
 		builders.add(new SlashCommandBuilder().setName("removechannel")
-			.setDescription("Remove a channel to be cleaned up")
+			.setDescription("Remove a channel from being cleaned up")
 			.setOptions(Collections.singletonList(
 				SlashCommandOption.createChannelOption("channel", "channels to clean up", true, channelTypeArrayList)
 			))

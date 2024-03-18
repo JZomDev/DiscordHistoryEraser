@@ -10,14 +10,14 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import org.historyeraser.Channels;
+import org.historyeraser.ConfiguredChannel;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.interaction.SlashCommandInteractionOption;
 import org.json.simple.JSONArray;
 
 public class AddChannelWorker
 {
-	private static final Type typeToken = new TypeToken<List<Channels>>()
+	private static final Type typeToken = new TypeToken<List<ConfiguredChannel>>()
 	{
 	}.getType();
 
@@ -27,7 +27,7 @@ public class AddChannelWorker
 			try
 			{
 
-				Channels channels = new Channels();
+				ConfiguredChannel configuredChannel = new ConfiguredChannel();
 				for (int i = 0; i < arg.size(); i++)
 				{
 					SlashCommandInteractionOption interactionOption = arg.get(i);
@@ -35,10 +35,10 @@ public class AddChannelWorker
 					switch (interactionOption.getName())
 					{
 						case "channel":
-							channels.textchannelid = interactionOption.getChannelValue().get().getIdAsString();
+							configuredChannel.textchannelid = interactionOption.getChannelValue().get().getIdAsString();
 							break;
 						case "hours":
-							channels.hours = interactionOption.getLongValue().get().longValue();
+							configuredChannel.hours = interactionOption.getLongValue().get().longValue();
 							break;
 					}
 				}
@@ -56,19 +56,19 @@ public class AddChannelWorker
 						fileContentStr.append(myReader.nextLine());
 					}
 					myReader.close();
-					List<Channels> json = gson.fromJson(fileContentStr.toString(), typeToken);
+					List<ConfiguredChannel> json = gson.fromJson(fileContentStr.toString(), typeToken);
 
-					for (Channels channels1 : json)
+					for (ConfiguredChannel configuredChannel1 : json)
 					{
-						if (channels1.textchannelid.equals(channels.textchannelid))
+						if (configuredChannel1.textchannelid.equals(configuredChannel.textchannelid))
 						{
 							continue;
 						}
-						jsonArray.add(channels1);
+						jsonArray.add(configuredChannel1);
 					}
 				}
 
-				jsonArray.add(channels);
+				jsonArray.add(configuredChannel);
 
 				BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("historyremover.json", false));
 				bufferedWriter.write(gson.toJson(jsonArray));

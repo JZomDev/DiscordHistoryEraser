@@ -55,7 +55,6 @@ public class Main
 
 			discordApi = builder.login().join();
 
-
 			discordApi.bulkOverwriteGlobalApplicationCommands(slashCommandsSetUp.getCommands()).join();
 			discordApi.addSlashCommandCreateListener(new AddChannels());
 			discordApi.addSlashCommandCreateListener(new RemoveChannels());
@@ -78,13 +77,13 @@ public class Main
 				try
 				{
 
-					ArrayList<CompletableFuture<Void>> b = new ArrayList<>();
+					ArrayList<CompletableFuture<Void>> completableFutureArrayList = new ArrayList<>();
 					ArrayList<Stream<Message>> streamArrayList = worker.execute(discordApi).join();
 					for (int j = 0; j < streamArrayList.size(); j++)
 					{
 						Stream<Message> messages = streamArrayList.get(j);
 						// only delete 50 (limit set in HistoryEraserWorker) messages at a time
-						b.add(CompletableFuture.allOf(
+						completableFutureArrayList.add(CompletableFuture.allOf(
 							messages.collect(Collectors.groupingBy(DiscordEntity::getApi, Collectors.toList()))
 								.entrySet().stream()
 								.map(entry -> Message.delete(entry.getKey(), entry.getValue()))
@@ -92,7 +91,7 @@ public class Main
 					}
 
 					// this is effectively await
-					for (CompletableFuture<Void> completableFuture : b)
+					for (CompletableFuture<Void> completableFuture : completableFutureArrayList)
 					{
 						completableFuture.join();
 					}

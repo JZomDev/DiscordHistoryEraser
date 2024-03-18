@@ -2,7 +2,7 @@ package org.historyeraser;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Channels
+public class ConfiguredChannel
 {
 	@SerializedName("textchannelid")
 	public String textchannelid;

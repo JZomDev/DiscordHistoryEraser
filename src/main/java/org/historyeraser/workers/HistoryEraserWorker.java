@@ -13,14 +13,14 @@ import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Stream;
-import org.historyeraser.Channels;
+import org.historyeraser.ConfiguredChannel;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 
 public class HistoryEraserWorker
 {
-	private static final Type typeToken = new TypeToken<List<Channels>>()
+	private static final Type typeToken = new TypeToken<List<ConfiguredChannel>>()
 	{
 	}.getType();
 	DiscordApi api;
@@ -48,12 +48,12 @@ public class HistoryEraserWorker
 				}
 				myReader.close();
 
-				List<Channels> json = gson.fromJson(fileContentStr.toString(), typeToken);
+				List<ConfiguredChannel> json = gson.fromJson(fileContentStr.toString(), typeToken);
 
-				for (Channels channels : json)
+				for (ConfiguredChannel configuredChannel : json)
 				{
-					String channelid = channels.textchannelid;
-					long hours = channels.hours;
+					String channelid = configuredChannel.textchannelid;
+					long hours = configuredChannel.hours;
 					Optional<TextChannel> textChannel = api.getTextChannelById(channelid);
 					if (textChannel.isPresent())
 					{
