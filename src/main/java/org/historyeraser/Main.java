@@ -83,7 +83,15 @@ public class Main
 					{
 						CompletableFuture<MessageSet> messages = streamArrayList.get(j);
 						messages.whenComplete((messageSet, throwable) -> {
-							completableFutureArrayList.add(messageSet.deleteAll());
+							if (throwable != null)
+							{
+								logger.error(throwable.getMessage(), throwable);
+							}
+							else if (messageSet.size() > 0)
+							{
+								logger.info("Found {} messages to delete, deleting them", messageSet.size());
+								completableFutureArrayList.add(messageSet.deleteAll());
+							}
 						});
 					}
 
